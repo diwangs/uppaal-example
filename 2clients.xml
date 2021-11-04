@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>/*
+Description
+- Reliable transmission (using ACK)
+- 2 clients
+- One in-flight packet at a time -&gt; also need to be expanded
+    - Flow based, not packet based
+
+old TODO:
+- State explosion?
+- Probabillistic verification in UPPAAL
+- Model the switch and probability? (with simple spine leaf later)
+    - Compute routes, with some man-made failures
+    - Compute Pr[S-&gt;D] given convergence time
+
+TODO:
+- Wrong timeout mechanism -&gt; it could go to a timeout state, but doesn't have to
+    - Set an intermediate location? (with invariant)
+    - Multiple clocks?
+- Relax the "one ping at a time" assumption:
+    - Don't know how to create 'packet' dynamically
+- Probabillistic verification?
+- Parameterization
+
+Thursday
+- Multiple ping at a time -&gt; somehow 'more' than just changing stuff? one component still can only process one packet at a time
+- Probabilistic verification -&gt; uniform and exponential distribution
+*/
+
+// Place global declarations here.
+broadcast chan send;
+broadcast chan receive;
+
+bool in_flight;
+
+clock t;
+int timeout := 20;
+int t_low_bound := 0;
+int link_delay := 1;
+int switching_delay := 1;
+
+int delivered_packets_cnt := 0;
+
+int next_hop;
+int[1,2] content; // 1 = data, 2 = ack
+
+// TODO: parameterize this?
+int src := 0;
+int dest := 3;
+
+
+
+</declaration>
+	<template>
+		<name>Switch</name>
+		<parameter>const int id</parameter>
+		<declaration>// TODO: how to parameterize this?
+
+int getNextHop(int id, int dest) {
+    int forwarding[4]; // forwarding[i] == next_hop to reach node i
+    if (id == 8) {
+        forwarding[0] = 0;
+        forwarding[1] = 1; // change to port number
+        forwarding[2] = 9;
+        forwarding[3] = 9;
+    } else if (id == 9) {
+        forwarding[0] = 8;
+        forwarding[1] = 8;
+        forwarding[2] = 2;
+        forwarding[3] = 3;
+    }
+    return forwarding[dest];
+}</declaration>
+		<location id="id0" x="-187" y="-85">
+		</location>
+		<location id="id1" x="8" y="-85">
+			<label kind="exponentialrate" x="-2" y="-51">1</label>
+		</location>
+		<location id="id2" x="42" y="-8">
+			<label kind="invariant" x="68" y="0">t&gt;=t_low_bound</label>
+			<committed/>
+		</location>
+		<branchpoint id="id3" x="42" y="-85">
+		</branchpoint>
+		<init ref="id0"/>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-187" y="-8">send!</label>
+			<label kind="assignment" x="-187" y="8">next_hop:=getNextHop(id, dest)</label>
+			<nail x="-187" y="-8"/>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id2"/>
+			<label kind="assignment" x="51" y="-59">t_low_bound+=switching_delay</label>
+			<label kind="probability" x="51" y="-76">0.98</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id0"/>
+			<label kind="probability" x="-169" y="-161">0.02</label>
+			<nail x="42" y="-170"/>
+			<nail x="-187" y="-170"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id3"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-169" y="-119">next_hop==id</label>
+			<label kind="synchronisation" x="-169" y="-102">receive?</label>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">Client</name>
+		<parameter>const int id, int switch</parameter>
+		<declaration>// Place local declarations here.</declaration>
+		<location id="id4" x="0" y="0">
+			<name x="-17" y="-42">idle</name>
+			<label kind="exponentialrate" x="34" y="-42">1</label>
+		</location>
+		<location id="id5" x="-136" y="178">
+			<name x="-255" y="169">data_received</name>
+		</location>
+		<location id="id6" x="144" y="178">
+			<name x="161" y="178">data_sent</name>
+			<label kind="invariant" x="170" y="195">t&lt;timeout</label>
+		</location>
+		<location id="id7" x="127" y="0">
+			<name x="119" y="-59">timeout_reached</name>
+			<label kind="invariant" x="119" y="-42">t&gt;=timeout</label>
+			<committed/>
+		</location>
+		<location id="id8" x="8" y="178">
+			<name x="17" y="144">data_delivered</name>
+			<label kind="invariant" x="17" y="127">t&lt;timeout</label>
+			<committed/>
+		</location>
+		<init ref="id4"/>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id4"/>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id8"/>
+			<label kind="guard" x="25" y="204">next_hop==id and
+content==2</label>
+			<label kind="synchronisation" x="25" y="187">receive?</label>
+			<label kind="assignment" x="25" y="238">in_flight:=false</label>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id4"/>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id7"/>
+			<nail x="272" y="178"/>
+			<nail x="272" y="0"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id6"/>
+			<label kind="guard" x="136" y="34">src==id and
+in_flight==false</label>
+			<label kind="synchronisation" x="136" y="17">send!</label>
+			<label kind="assignment" x="136" y="76">t:=0,
+in_flight:=true,
+next_hop:=switch,
+content:=1</label>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-119" y="187">send!</label>
+			<label kind="assignment" x="-119" y="204">dest:=src,
+next_hop:=switch,
+content:=2</label>
+			<nail x="-8" y="178"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id5"/>
+			<label kind="guard" x="-204" y="42">next_hop==id and
+content==1</label>
+			<label kind="synchronisation" x="-204" y="25">receive?</label>
+		</transition>
+	</template>
+	<template>
+		<name>Network</name>
+		<location id="id9" x="-119" y="0">
+			<name x="-178" y="-8">Listen</name>
+		</location>
+		<location id="id10" x="51" y="0">
+			<name x="85" y="-8">Delivering</name>
+			<label kind="exponentialrate" x="41" y="34">1</label>
+		</location>
+		<location id="id11" x="76" y="68">
+			<label kind="invariant" x="110" y="60">t &gt;= t_low_bound</label>
+			<committed/>
+		</location>
+		<branchpoint id="id12" x="76" y="0">
+		</branchpoint>
+		<init ref="id9"/>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="-93" y="76">receive!</label>
+			<nail x="-119" y="68"/>
+		</transition>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id11"/>
+			<label kind="assignment" x="93" y="34">t_low_bound+=link_delay</label>
+			<label kind="probability" x="93" y="17">0.99</label>
+		</transition>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id9"/>
+			<label kind="assignment" x="-93" y="-68">in_flight:=false</label>
+			<label kind="probability" x="-93" y="-93">0.01</label>
+			<nail x="76" y="-68"/>
+			<nail x="-119" y="-68"/>
+		</transition>
+		<transition>
+			<source ref="id10"/>
+			<target ref="id12"/>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id10"/>
+			<label kind="synchronisation" x="-93" y="-25">send?</label>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+Client0 = Client(0, 8);
+Client1 = Client(1, 8);
+Client2 = Client(2, 9);
+Client3 = Client(3, 9);
+
+Switch8 = Switch(8);
+Switch9 = Switch(9);
+
+// List one or more processes to be composed into a system.
+system Client0, Client3, Switch8, Switch9, Network;
+    </system>
+	<queries>
+		<query>
+			<formula>E&lt;&gt; Client0.data_delivered</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; Client0.data_delivered and t&lt;=10</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; Client0.data_delivered and t&lt;=2</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>Pr[t &lt;= 20](&lt;&gt; Client0.idle)</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>Pr[t &lt;= 20](&lt;&gt; Client0.data_delivered)</formula>
+			<comment></comment>
+		</query>
+	</queries>
+</nta>
