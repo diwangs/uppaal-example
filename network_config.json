@@ -1,0 +1,65 @@
+{
+    "version": "0.1",
+    "topology": {
+      "nodes": [
+        "node_A",
+        "node_B",
+        "node_C"
+      ],
+      "links": [
+        {
+          "u": "node_A", "v": "node_B", "w_uv": 1, "w_vu": 2
+        }
+      ],
+      "static_routes": [],
+      "bgp": {
+        "as": 1000,
+        "internal_routers": [
+          {
+            "node": "node_A",
+            "peer_id": 1
+          },
+          {
+            "node": "node_B",
+            "peer_id": 2
+          }
+        ],
+        "external_routers": [
+          {
+            "name": "ext_A",
+            "peers_with": "node_A",
+            "peer_id": 500,
+            "as": 0
+          }
+        ],
+        "internal_sessions": [
+          {
+            "route_reflector": "node_B",
+            "client": "node_A"
+          }
+        ]
+      }
+    },
+    "announcements": {
+        "10.0.0.0/8": {
+          "ext_A": {
+            "lp": 0,
+            "aspl": 0,
+            "origin": 0,
+            "med": 0
+          }
+        }
+      },
+    "failures": {
+        "type": "LinkFailureModel",
+        "p_link_failure": 0.001
+      },
+    "properties": [{
+      "type": "Reachable",
+      "flow": {
+        "src": "node_B",
+        "dst": "10.0.0.0/8"
+      }
+    }]
+  }
+  
