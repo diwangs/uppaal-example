@@ -3,49 +3,36 @@
     "topology": {
       "nodes": [
         "node_A",
-        "node_B"
+        "node_B",
+        "node_C",
+        "node_D",
+        "sw_8",
+        "sw_9"
       ],
       "links": [
-        {
-          "u": "node_A", "v": "node_B", "w_uv": 0, "w_vu": 0
-        }
+        {"u": "node_A", "v": "sw_8", "w_uv": 1, "w_vu": 1},
+        {"u": "node_B", "v": "sw_8", "w_uv": 1, "w_vu": 1},
+        {"u": "node_C", "v": "sw_9", "w_uv": 1, "w_vu": 1},
+        {"u": "node_D", "v": "sw_9", "w_uv": 1, "w_vu": 1},
+        {"u": "sw_8", "v": "sw_9", "w_uv": 1, "w_vu": 1}
       ],
-      "static_routes": [  {
-        "u": "node_A",
-        "v": "node_B",
-        "dst": "192.168.0.0/16"
-      }],
+      "static_routes": [],
       "bgp": {
         "as": 1000,
-        "internal_routers": [
-          {
-            "node": "node_A",
-            "peer_id": 1
-          },
-          {
-            "node": "node_B",
-            "peer_id": 2
-          }
-        ],
+        "auto": "full_mesh",
         "external_routers": [
           {
-            "name": "ext_A",
-            "peers_with": "node_A",
+            "name": "ext_D",
+            "peers_with": "node_D",
             "peer_id": 500,
             "as": 0
-          }
-        ],
-        "internal_sessions": [
-          {
-            "route_reflector": "node_B",
-            "client": "node_A"
           }
         ]
       }
     },
     "announcements": {
         "10.0.0.0/8": {
-          "ext_A": {
+          "ext_D": {
             "lp": 0,
             "aspl": 0,
             "origin": 0,
@@ -55,12 +42,12 @@
       },
     "failures": {
         "type": "LinkFailureModel",
-        "p_link_failure": 0.001
+        "p_link_failure": 0.01
       },
     "properties": [{
       "type": "Reachable",
       "flow": {
-        "src": "node_B",
+        "src": "node_A",
         "dst": "10.0.0.0/8"
       }
     }]
