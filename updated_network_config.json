@@ -1,0 +1,56 @@
+{
+  "version": "0.1",
+  "topology": {
+    "nodes": [
+      "n1",
+      "n2",
+      "n3",
+      "n4",
+      "sw_1",
+      "sw_2"
+    ],
+    "links": [
+      {"u": "n1", "v": "sw_1", "w_uv": 1, "w_vu": 1},
+      {"u": "n2", "v": "sw_1", "w_uv": 1, "w_vu": 1},
+      {"u": "n3", "v": "sw_2", "w_uv": 1, "w_vu": 1},
+      {"u": "n4", "v": "sw_2", "w_uv": 1, "w_vu": 1},
+      {"u": "sw_1", "v": "sw_2", "w_uv": 1, "w_vu": 1}
+    ],
+    "static_routes": [],
+    "bgp": {
+      "as": 1000,
+      "auto": "full_mesh",
+      "external_routers": [
+        {
+          "name": "ext_4",
+          "peers_with": "n4",
+          "peer_id": 500,
+          "as": 0
+        }
+      ]
+    }
+  },
+  "announcements": {
+      "10.0.0.0/8": {
+        "ext_4": {
+          "lp": 0,
+          "aspl": 0,
+          "origin": 0,
+          "med": 0
+        }
+      }
+    },
+  "failures": {
+      "type": "LinkFailureModel",
+      "p_link_failure": 0.01
+    },
+  "properties": [{
+    "type": "Reachable",
+    "flow": {
+      "src": "n1",
+      "dst": "10.0.0.0/8"
+    }
+  }]
+}
+
+ 
