@@ -27,6 +27,11 @@ TODO:
 Thursday
 - Multiple ping at a time -&gt; somehow 'more' than just changing stuff? one component still can only process one packet at a time
 - Probabilistic verification -&gt; uniform and exponential distribution
+
+TODO:
+- multiple packets
+- queue in switch
+- timing -&gt; upper bound as invariant, lower bound as transition
 */
 
 // Place global declarations here.
