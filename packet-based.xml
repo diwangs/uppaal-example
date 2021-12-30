@@ -44,13 +44,47 @@ id_t temp;</declaration>
 			<name x="-229" y="-51">on_link</name>
 			<label kind="invariant" x="-221" y="0">t &lt; 5</label>
 		</location>
-		<branchpoint id="id2" x="-59" y="-17">
+		<location id="id2" x="-59" y="-127">
+			<name x="-69" y="-161">drop</name>
+			<label kind="invariant" x="-68" y="-178">t&lt;2</label>
+		</location>
+		<location id="id3" x="-59" y="85">
+			<name x="-68" y="110">success</name>
+			<label kind="invariant" x="-68" y="127">t &lt; 2</label>
+		</location>
+		<branchpoint id="id4" x="-59" y="-17">
 		</branchpoint>
 		<init ref="id0"/>
 		<transition>
-			<source ref="id1"/>
+			<source ref="id2"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-340" y="-178">t&gt;=1</label>
+			<label kind="assignment" x="-340" y="-161">t=0</label>
+			<nail x="-357" y="-127"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
 			<target ref="id2"/>
+			<label kind="probability" x="-42" y="-76">1</label>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id3"/>
+			<label kind="probability" x="-42" y="25">99</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-340" y="93">t&gt;=1</label>
+			<label kind="synchronisation" x="-340" y="110">leave[id][temp]!</label>
+			<label kind="assignment" x="-340" y="127">t=0</label>
+			<nail x="-358" y="85"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id4"/>
 			<label kind="guard" x="-144" y="-42">t &gt;= 1</label>
+			<label kind="assignment" x="-144" y="-17">t=0</label>
 		</transition>
 		<transition>
 			<source ref="id0"/>
@@ -58,78 +92,6 @@ id_t temp;</declaration>
 			<label kind="select" x="-340" y="-76">p : id_t</label>
 			<label kind="synchronisation" x="-340" y="-59">appr[id][p]?</label>
 			<label kind="assignment" x="-340" y="-42">temp=p, t=0</label>
-		</transition>
-		<transition>
-			<source ref="id2"/>
-			<target ref="id0"/>
-			<label kind="synchronisation" x="-340" y="34">leave[id][temp]!</label>
-			<label kind="probability" x="-339" y="51">9</label>
-			<nail x="-59" y="34"/>
-			<nail x="-357" y="34"/>
-		</transition>
-		<transition>
-			<source ref="id2"/>
-			<target ref="id0"/>
-			<label kind="synchronisation" x="-340" y="-127">drop[temp]!</label>
-			<label kind="probability" x="-340" y="-144">1</label>
-			<nail x="-59" y="-93"/>
-			<nail x="-357" y="-93"/>
-		</transition>
-	</template>
-	<template>
-		<name>ProbTest</name>
-		<declaration>clock t;</declaration>
-		<location id="id3" x="-187" y="0">
-			<name x="-197" y="-34">choose</name>
-			<label kind="invariant" x="-197" y="17">t &lt; 2</label>
-		</location>
-		<location id="id4" x="51" y="-246">
-			<name x="41" y="-280">success</name>
-			<label kind="invariant" x="41" y="-229">t &lt; 2</label>
-		</location>
-		<location id="id5" x="59" y="221">
-			<name x="49" y="187">fail</name>
-			<label kind="invariant" x="49" y="238">t &lt; 2</label>
-		</location>
-		<location id="id6" x="-340" y="0">
-			<name x="-350" y="-34">initi</name>
-		</location>
-		<branchpoint id="id7" x="-42" y="0">
-		</branchpoint>
-		<init ref="id6"/>
-		<transition>
-			<source ref="id5"/>
-			<target ref="id6"/>
-			<label kind="guard" x="-322" y="76">t &gt;= 1</label>
-			<label kind="assignment" x="-322" y="110">t=0</label>
-		</transition>
-		<transition>
-			<source ref="id4"/>
-			<target ref="id6"/>
-			<label kind="guard" x="-322" y="-157">t &gt;= 1</label>
-			<label kind="synchronisation" x="-322" y="-140">leave[0][0]!</label>
-			<label kind="assignment" x="-322" y="-123">t=0</label>
-		</transition>
-		<transition>
-			<source ref="id6"/>
-			<target ref="id3"/>
-			<label kind="synchronisation" x="-297" y="-25">appr[0][0]?</label>
-		</transition>
-		<transition>
-			<source ref="id3"/>
-			<target ref="id7"/>
-			<label kind="guard" x="-119" y="-25">t &gt;= 1</label>
-			<label kind="assignment" x="-119" y="0">t = 0</label>
-		</transition>
-		<transition>
-			<source ref="id7"/>
-			<target ref="id5"/>
-			<label kind="probability" x="-17" y="17">1</label>
-		</transition>
-		<transition>
-			<source ref="id7"/>
-			<target ref="id4"/>
-			<label kind="probability" x="-17" y="-25">4</label>
 		</transition>
 	</template>
 	<template>
@@ -181,110 +143,66 @@ eid_t getNextHop(eid_t curLoc, id_t dst) {
 
     return forwarding[dst];
 }</declaration>
-		<location id="id8" x="-246" y="-212">
+		<location id="id5" x="-246" y="-212">
 			<name x="-340" y="-221">on_sender</name>
 			<label kind="invariant" x="-263" y="-195">t &lt; 2</label>
 		</location>
-		<location id="id9" x="59" y="-212">
+		<location id="id6" x="59" y="-212">
 			<name x="42" y="-195">on_link</name>
 		</location>
-		<location id="id10" x="59" y="-450">
+		<location id="id7" x="59" y="-450">
 			<name x="34" y="-493">on_switch</name>
 		</location>
-		<location id="id11" x="391" y="-212">
+		<location id="id8" x="391" y="-212">
 			<name x="417" y="-221">on_receiver</name>
 		</location>
-		<location id="id12" x="17" y="-331">
+		<location id="id9" x="17" y="-331">
 			<committed/>
 		</location>
-		<location id="id13" x="93" y="-331">
+		<location id="id10" x="93" y="-331">
 			<committed/>
 		</location>
-		<init ref="id8"/>
+		<init ref="id5"/>
 		<transition>
-			<source ref="id13"/>
-			<target ref="id9"/>
+			<source ref="id10"/>
+			<target ref="id6"/>
 			<label kind="synchronisation" x="93" y="-280">appr[0][id]!</label>
 		</transition>
 		<transition>
-			<source ref="id10"/>
-			<target ref="id13"/>
+			<source ref="id7"/>
+			<target ref="id10"/>
 			<label kind="guard" x="102" y="-450">t &gt;= 1</label>
 			<label kind="synchronisation" x="102" y="-433">leave[next_hop][id]?</label>
 			<label kind="assignment" x="102" y="-416">next_hop = getNextHop(next_hop, dst)</label>
 		</transition>
 		<transition>
-			<source ref="id12"/>
-			<target ref="id10"/>
+			<source ref="id9"/>
+			<target ref="id7"/>
 			<label kind="synchronisation" x="-102" y="-416">appr[next_hop][id]!</label>
 		</transition>
 		<transition>
-			<source ref="id9"/>
-			<target ref="id12"/>
+			<source ref="id6"/>
+			<target ref="id9"/>
 			<label kind="guard" x="-136" y="-297">next_hop &gt;= 10 &amp;&amp;
 t &gt;= 1</label>
 			<label kind="synchronisation" x="-136" y="-263">leave[0][id]?</label>
 		</transition>
 		<transition>
-			<source ref="id9"/>
-			<target ref="id11"/>
+			<source ref="id6"/>
+			<target ref="id8"/>
 			<label kind="guard" x="119" y="-204">next_hop &lt; 10 &amp;&amp;
 t &gt;= 1</label>
 			<label kind="synchronisation" x="119" y="-161">leave[0][id]?</label>
 			<label kind="assignment" x="119" y="-144">next_hop = getNextHop(next_hop, dst)</label>
 		</transition>
 		<transition>
-			<source ref="id8"/>
-			<target ref="id9"/>
+			<source ref="id5"/>
+			<target ref="id6"/>
 			<label kind="guard" x="-204" y="-204">t &gt;= 1</label>
 			<label kind="synchronisation" x="-204" y="-186">appr[0][id]!</label>
 			<label kind="assignment" x="-204" y="-170">next_hop = getNextHop(src,dst),
 total = 0,
 t = 0</label>
-		</transition>
-	</template>
-	<template>
-		<name>PacketMock</name>
-		<parameter>const id_t id, int src, int dst</parameter>
-		<declaration>// TODO: how to parameterize this?
-
-clock t;</declaration>
-		<location id="id14" x="-323" y="-25">
-			<label kind="exponentialrate" x="-333" y="9">1</label>
-		</location>
-		<location id="id15" x="-229" y="-25">
-			<name x="-238" y="-8">on_link</name>
-		</location>
-		<location id="id16" x="-136" y="-25">
-			<committed/>
-		</location>
-		<location id="id17" x="-51" y="-25">
-			<name x="-68" y="-8">on_switch</name>
-		</location>
-		<location id="id18" x="42" y="-25">
-			<name x="76" y="-42">on_receiver</name>
-		</location>
-		<init ref="id14"/>
-		<transition>
-			<source ref="id17"/>
-			<target ref="id18"/>
-			<label kind="synchronisation" x="-42" y="-68">leave[20][id]?</label>
-		</transition>
-		<transition>
-			<source ref="id16"/>
-			<target ref="id17"/>
-			<label kind="synchronisation" x="-136" y="-68">appr[20][id]!</label>
-		</transition>
-		<transition>
-			<source ref="id15"/>
-			<target ref="id16"/>
-			<label kind="synchronisation" x="-229" y="-68">leave[0][id]?</label>
-		</transition>
-		<transition>
-			<source ref="id14"/>
-			<target ref="id15"/>
-			<label kind="synchronisation" x="-323" y="-68">appr[0][id]!</label>
-			<label kind="assignment" x="-306" y="-51">t=0</label>
 		</transition>
 	</template>
 	<template>
@@ -329,114 +247,86 @@ id_t tail()
 {
    return list[len - 1];
 }</declaration>
-		<location id="id19" x="161" y="-314">
-			<name x="119" y="-323">idle</name>
-			<label kind="exponentialrate" x="144" y="-289">1</label>
+		<location id="id11" x="-76" y="-314">
+			<name x="-59" y="-340">idle</name>
+			<label kind="invariant" x="-136" y="-323">t &lt; 4</label>
 		</location>
-		<location id="id20" x="306" y="-314">
-			<name x="323" y="-323">received</name>
+		<location id="id12" x="306" y="-314">
+			<name x="314" y="-306">received</name>
 			<committed/>
 		</location>
-		<location id="id21" x="-59" y="-314">
-			<label kind="invariant" x="-119" y="-323">t &lt; 4</label>
+		<location id="id13" x="714" y="-314">
+			<name x="731" y="-331">empty</name>
 		</location>
-		<init ref="id19"/>
+		<init ref="id13"/>
 		<transition>
-			<source ref="id21"/>
-			<target ref="id19"/>
-			<label kind="guard" x="0" y="-246">t &gt;= 1</label>
-			<label kind="synchronisation" x="0" y="-229">leave[id][front()]!</label>
-			<label kind="assignment" x="0" y="-212">dequeue(),
+			<source ref="id12"/>
+			<target ref="id13"/>
+			<label kind="guard" x="450" y="-450">len + 1 &gt; qsize &amp;&amp; len == 0</label>
+			<nail x="339" y="-416"/>
+			<nail x="714" y="-416"/>
+		</transition>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id13"/>
+			<label kind="guard" x="187" y="-187">t &gt;= 1 &amp;&amp; len - 1 == 0</label>
+			<label kind="synchronisation" x="187" y="-170">leave[id][front()]!</label>
+			<label kind="assignment" x="187" y="-153">dequeue(),
 t=0</label>
-			<nail x="42" y="-255"/>
+			<nail x="-76" y="-212"/>
+			<nail x="714" y="-212"/>
 		</transition>
 		<transition>
-			<source ref="id19"/>
-			<target ref="id21"/>
-			<label kind="guard" x="25" y="-433">len &gt; 0 &amp;&amp;
-t &gt;= 1</label>
-			<label kind="assignment" x="25" y="-450">t = 0</label>
-			<nail x="42" y="-382"/>
+			<source ref="id11"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-348" y="-357">t &gt;= 1 &amp;&amp; len - 1 &gt; 0</label>
+			<label kind="synchronisation" x="-348" y="-340">leave[id][front()]!</label>
+			<label kind="assignment" x="-348" y="-323">dequeue(),
+t=0</label>
+			<nail x="-170" y="-416"/>
+			<nail x="-357" y="-416"/>
+			<nail x="-357" y="-212"/>
+			<nail x="-170" y="-212"/>
 		</transition>
 		<transition>
-			<source ref="id20"/>
-			<target ref="id19"/>
-			<label kind="guard" x="187" y="-297">len + 1 &lt;= qsize</label>
-			<label kind="assignment" x="187" y="-280">enqueue(temp)</label>
+			<source ref="id13"/>
+			<target ref="id12"/>
+			<label kind="select" x="365" y="-391">e : id_t</label>
+			<label kind="synchronisation" x="365" y="-374">appr[id][e]?</label>
+			<label kind="assignment" x="365" y="-357">temp=e,
+t=0</label>
+		</transition>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id11"/>
+			<label kind="guard" x="34" y="-297">len + 1 &lt;= qsize</label>
+			<label kind="assignment" x="34" y="-280">enqueue(temp)</label>
 			<nail x="306" y="-255"/>
-			<nail x="161" y="-255"/>
+			<nail x="-34" y="-255"/>
 		</transition>
 		<transition>
-			<source ref="id20"/>
-			<target ref="id19"/>
-			<label kind="guard" x="195" y="-425">len + 1 &gt; qsize</label>
-			<label kind="synchronisation" x="195" y="-408">drop[temp]!</label>
-			<nail x="306" y="-382"/>
-			<nail x="161" y="-382"/>
+			<source ref="id12"/>
+			<target ref="id11"/>
+			<label kind="guard" x="34" y="-450">len + 1 &gt; qsize &amp;&amp; len &gt; 0</label>
+			<nail x="280" y="-416"/>
+			<nail x="-76" y="-416"/>
 		</transition>
 		<transition>
-			<source ref="id19"/>
-			<target ref="id20"/>
-			<label kind="select" x="195" y="-374">e : id_t</label>
-			<label kind="synchronisation" x="195" y="-357">appr[id][e]?</label>
-			<label kind="assignment" x="195" y="-340">temp=e</label>
+			<source ref="id11"/>
+			<target ref="id12"/>
+			<label kind="select" x="178" y="-382">e : id_t</label>
+			<label kind="synchronisation" x="178" y="-365">appr[id][e]?</label>
+			<label kind="assignment" x="178" y="-348">temp=e</label>
 		</transition>
 	</template>
-	<template>
-		<name>ProbTestDriver</name>
-		<declaration>clock t;</declaration>
-		<location id="id22" x="-238" y="-17">
-			<name x="-248" y="-51">start</name>
-			<label kind="invariant" x="-248" y="0">t &lt; 2</label>
-		</location>
-		<location id="id23" x="-25" y="-17">
-			<name x="-35" y="-51">prob</name>
-		</location>
-		<location id="id24" x="161" y="-17">
-			<name x="151" y="-51">mid</name>
-			<label kind="invariant" x="151" y="0">t &lt; 2</label>
-		</location>
-		<location id="id25" x="323" y="-17">
-			<name x="313" y="-51">prob2</name>
-		</location>
-		<location id="id26" x="501" y="-17">
-			<name x="491" y="-51">end</name>
-		</location>
-		<init ref="id22"/>
-		<transition>
-			<source ref="id25"/>
-			<target ref="id26"/>
-			<label kind="synchronisation" x="374" y="-68">leave[0][0]?</label>
-			<label kind="assignment" x="391" y="-8">t=0</label>
-		</transition>
-		<transition>
-			<source ref="id24"/>
-			<target ref="id25"/>
-			<label kind="guard" x="195" y="-51">t &gt;= 1</label>
-			<label kind="synchronisation" x="195" y="-68">appr[0][0]!</label>
-			<label kind="assignment" x="195" y="-17">t=0</label>
-		</transition>
-		<transition>
-			<source ref="id23"/>
-			<target ref="id24"/>
-			<label kind="synchronisation" x="34" y="-68">leave[0][0]?</label>
-			<label kind="assignment" x="34" y="-8">t=0</label>
-		</transition>
-		<transition>
-			<source ref="id22"/>
-			<target ref="id23"/>
-			<label kind="guard" x="-178" y="-51">t &gt;= 1</label>
-			<label kind="synchronisation" x="-178" y="-68">appr[0][0]!</label>
-			<label kind="assignment" x="-161" y="-8">t = 0</label>
-		</transition>
-	</template>
-	<system>//P1 = Packet(1, 1, 4);
-//S20 = Switch(20);
-//S21 = Switch(21);
-//Net = Link(0);
-//system P1, S20, S21, Net;
+	<system>P1 = Packet(1, 1, 4);
+S20 = Switch(20);
+S21 = Switch(21);
+Net = Link(0);
 
-system ProbTest, ProbTestDriver;
+system P1, S20, S21, Net;
+
+//system Net, S20, ProbTestDriver;
 
 /*gantt {
   G: // gate line
@@ -451,7 +341,7 @@ system ProbTest, ProbTestDriver;
 }*/</system>
 	<queries>
 		<query>
-			<formula>Pr[# &lt;= 30; 10000](&lt;&gt; P1.on_receiver)</formula>
+			<formula>Pr[# &lt;= 40; 10000](&lt;&gt; P1.on_receiver)</formula>
 			<comment></comment>
 		</query>
 		<query>
@@ -471,7 +361,7 @@ system ProbTest, ProbTestDriver;
 			<comment></comment>
 		</query>
 		<query>
-			<formula>Pr[# &lt;= 10; 10000](&lt;&gt; ProbTestDriver.end)</formula>
+			<formula>Pr[# &lt;= 20; 10000](&lt;&gt; ProbTestDriver.end)</formula>
 			<comment></comment>
 		</query>
 		<query>
